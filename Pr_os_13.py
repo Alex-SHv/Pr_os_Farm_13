@@ -52,7 +52,6 @@ class FieldCell:
         self.btn.config(bg="green4", fg="white", text=f"{self.plant['name']} (готово)")
         self.label.config(text="Стадия: созрело")
 
-
     def collect(self):
         self.barn.add_item(self.plant["name"])
 
@@ -63,6 +62,36 @@ class FieldCell:
         self.plant = None
         self.fertilizer = None
 
+class BarnWindow:
+    def __init__(self, parent):
+        self.top = tk.Toplevel(parent)
+        self.top.title("Амбар")
+        self.top.geometry("300x400")
+
+        self.storage = {} 
+
+        self.label = tk.Label(self.top, text="Амбар пуст", font=("Arial", 14))
+        self.label.pack(pady=20)
+
+    def add_item(self, plant_name):
+        self.storage[plant_name] = self.storage.get(plant_name, 0) + 1
+        self.refresh()
+
+    def remove_item(self, name, count):
+        if name in self.storage and self.storage[name] >= count:
+            self.storage[name] -= count
+            if self.storage[name] == 0:
+                del self.storage[name]
+        self.refresh()
+
+    def refresh(self):
+        if not self.storage:
+            self.label.config(text="Амбар пуст")
+        else:
+            text = "\n".join([f"{k}: {v}" for k, v in self.storage.items()])
+            self.label.config(text=text)
+
+
 class Game:
     def __init__(self):
         self.root = tk.Tk()
@@ -71,6 +100,8 @@ class Game:
 
         self.money = 50
         self.inventory = {}   
+
+        self.barn = BarnWindow(self.root)
 
         tk.Button(self.root, text="Открыть магазин", font=("Arial", 14)).place(x=700, y=30)
 
